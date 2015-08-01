@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include layout="@layout/toolbar"/>
+    <RelativeLayout
+        android:id="@+id/map_relative_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            tools:context=".MapsActivity"
+            android:name="com.google.android.gms.maps.SupportMapFragment" />
+        <FrameLayout
+            android:id="@+id/container_details"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="64dp"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+</LinearLayout>
