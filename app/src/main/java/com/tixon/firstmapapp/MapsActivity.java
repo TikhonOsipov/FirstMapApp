@@ -1,15 +1,19 @@
 package com.tixon.firstmapapp;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -27,13 +31,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends ActionBarActivity {
+public class MapsActivity extends AppCompatActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    FragmentManager fragmentManager;
-    Fragment detailsFragment = null;
     ArrayList<Marker> markers;
-    Toolbar toolbar;
 
     public static final String KEY_TITLE = "key_title";
     public static final String KEY_DESCRIPTION = "key_description";
@@ -43,12 +44,11 @@ public class MapsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        fragmentManager = getSupportFragmentManager();
-        detailsFragment = null;
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(getResources().getString(R.string.app_name));
-        setSupportActionBar(toolbar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            getWindow().setStatusBarColor(getResources().getColor(R.color.primary700));
+
+        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
 
         setUpMapIfNeeded();
 
@@ -57,8 +57,9 @@ public class MapsActivity extends ActionBarActivity {
         locationManager = (LocationManager) getSystemService(svcName);
 
         String provider = LocationManager.GPS_PROVIDER;
-        Location l = locationManager.getLastKnownLocation(provider);
-        updateWithNewLocation(l);
+
+        //Location l = locationManager.getLastKnownLocation(provider);
+        //updateWithNewLocation(l);
     }
 
     private void updateWithNewLocation(Location l) {
@@ -105,19 +106,17 @@ public class MapsActivity extends ActionBarActivity {
                     return null;
                 }
 
+                //Setting up info window layout
                 @Override
                 public View getInfoContents(Marker marker) {
                     View view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
                     final String title = marker.getTitle();
-                    final String description = marker.getSnippet();
                     String markerId = marker.getId();
 
                     TextView tv_title = (TextView) view.findViewById(R.id.info_window_tv_title);
-                    TextView tv_description = (TextView) view.findViewById(R.id.info_window_tv_description);
                     ImageView iv = (ImageView) view.findViewById(R.id.info_window_image_view);
 
                     tv_title.setText(title);
-                    tv_description.setText(description);
                     iv.setImageDrawable(getDrawable(markerId));
                     return view;
                 }
@@ -127,14 +126,14 @@ public class MapsActivity extends ActionBarActivity {
                 @Override
                 public void onMapClick(LatLng latLng) {
                     Log.d("myLogs", "map clicked");
-                    FragmentTransaction fragmentTransaction =
+                    /*FragmentTransaction fragmentTransaction =
                             fragmentManager.beginTransaction();
                     if(detailsFragment != null) {
                         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
                         fragmentTransaction.remove(detailsFragment);
                         detailsFragment = null;
                     }
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commit();*/
                 }
             });
 
@@ -176,18 +175,33 @@ public class MapsActivity extends ActionBarActivity {
      */
     private void setUpMap() {
         markers = new ArrayList<>();
-        markers.add(mMap.addMarker(new MarkerOptions().position(new LatLng(59.9407, 30.3218))
-                .snippet(getResources().getString(R.string.pushkin_apartment_snippet)).title("Музей-квартира Пушкина")));
-        markers.add(mMap.addMarker(new MarkerOptions().position(new LatLng(59.9339, 30.3065))
-                .snippet(getResources().getString(R.string.cathedral_snippet)).title("Исаакиевский собор")));
-        markers.add(mMap.addMarker(new MarkerOptions().position(new LatLng(59.9404, 30.3138))
-                .snippet(getResources().getString(R.string.winter_palace_snippet)).title("Зимний дворец")));
-        markers.add(mMap.addMarker(new MarkerOptions().position(new LatLng(59.931935, 30.304934))
-                .snippet(getResources().getString(R.string.nabokov_mansion_snippet)).title(getResources().getString(R.string.nabokov_mansion_title))));
+
+        addMarker(59.9407, 30.3218, "Музей-квартира Пушкина",
+                getResources().getString(R.string.pushkin_apartment_snippet));
+        addMarker(59.9339, 30.3065, "Исаакиевский собор",
+                getResources().getString(R.string.cathedral_snippet));
+        addMarker(59.9404, 30.3138, "Зимний дворец",
+                getResources().getString(R.string.winter_palace_snippet));
+        addMarker(59.931935, 30.304934, getResources().getString(R.string.nabokov_mansion_title),
+                getResources().getString(R.string.nabokov_mansion_snippet));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(markers.get(0).getPosition(), 12F));
         //CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 12F)
         //markers.get(0).showInfoWindow();
         //moveMap();
+    }
+
+    /**
+     *
+     * @param lat: latitude of place
+     * @param lng: longitude of place
+     * @param title: title of place
+     * @param description: description of place
+     */
+    private void addMarker(double lat, double lng, String title, String description) {
+        LatLng mLatLng = new LatLng(lat, lng);
+        MarkerOptions marker =
+                new MarkerOptions().position(mLatLng).snippet(description).title(title);
+        markers.add(mMap.addMarker(marker));
     }
 
     private void moveMap() {

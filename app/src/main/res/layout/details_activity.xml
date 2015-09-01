@@ -4,11 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#bbffffff"
-        android:id="@+id/details_activity_toolbar"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,6 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/details_activity_tv_description"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="text"
                 android:layout_below="@id/details_activity_image_view"/>
         </RelativeLayout>
